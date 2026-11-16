@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Cameras</title>
+<link rel="manifest" href="/ui/manifest.webmanifest">
+<link rel="icon" href="/ui/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/ui/icons/icon-192.png">
+<link rel="stylesheet" href="/ui/style.css">
+</head>
+<body class="home">
+<header class="topbar">
+  <div class="titles">
+    <h1>Cameras</h1>
+    <span class="pill" id="summaryPill">loading</span>
+  </div>
+  <button class="icon-btn" id="addBtn" type="button" aria-label="Add a camera">+</button>
+</header>
+
+<main>
+  <div class="cams" id="cams"></div>
+  <p class="empty" id="empty" hidden>No cameras yet. Tap + to add one.</p>
+  <p class="hint" style="margin-top:18px;font-size:12px;color:#6f8195">
+    Everything runs on this device and only listens on 127.0.0.1. Recordings and alarm settings are read directly from the camera.
+  </p>
+</main>
+
+<dialog id="addSheet">
+  <h2>Add a V380 camera</h2>
+  <p class="hint">Use the same device ID and credentials you use in the phone app. Firmware support varies by model.</p>
+  <form method="post" action="/add" id="addForm" class="cam-form">
+    <div class="field"><label for="f-name">Name</label><input id="f-name" name="name" required maxlength="80" placeholder="Front door"></div>
+    <div class="field"><label for="f-host">IP address</label><input id="f-host" name="host" required inputmode="decimal" placeholder="192.168.1.50"></div>
+    <div class="field"><label for="f-device">Device ID</label><input id="f-device" name="deviceId" type="number" min="1" required placeholder="12345678"></div>
+    <div class="field"><label for="f-user">Username</label><input id="f-user" name="username" required autocomplete="username"></div>
+    <div class="field"><label for="f-pass">Password</label><input id="f-pass" name="password" type="password" autocomplete="current-password"></div>
+    <div class="field"><label for="f-quality">Stream</label>
+      <select id="f-quality" name="quality">
+        <option value="sd">Lower resolution</option>
+        <option value="hd">Higher resolution</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" id="cancelAdd" type="button">Cancel</button>
+      <button class="btn primary" type="submit">Add camera</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="manageSheet">
+  <h2 id="manageTitle">Camera</h2>
+  <p class="hint" id="manageHint"></p>
+  <div class="btn-row" style="margin-top:4px">
+    <button class="btn primary" id="manageEdit" type="button">Edit</button>
+    <button class="btn" id="manageRemove" type="button">Remove</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn ghost" id="manageCancel" type="button" style="flex:1">Close</button>
+  </div>
+</dialog>
+
+<dialog id="editSheet">
+  <h2>Edit camera</h2>
+  <p class="hint">Leave the password empty to keep the saved one.</p>
+  <form method="post" action="/edit" id="editForm" class="cam-form">
+    <input type="hidden" name="id" id="e-id">
+    <div class="field"><label for="e-name">Name</label><input id="e-name" name="name" required maxlength="80"></div>
+    <div class="field"><label for="e-host">IP address</label><input id="e-host" name="host" required inputmode="decimal"></div>
+    <div class="field"><label for="e-device">Device ID</label><input id="e-device" name="deviceId" type="number" min="1" required></div>
+    <div class="field"><label for="e-user">Username</label><input id="e-user" name="username" required autocomplete="username"></div>
+    <div class="field"><label for="e-pass">Password</label><input id="e-pass" name="password" type="password" autocomplete="current-password" placeholder="Unchanged"></div>
+    <div class="field"><label for="e-quality">Stream</label>
+      <select id="e-quality" name="quality">
+        <option value="sd">Lower resolution</option>
+        <option value="hd">Higher resolution</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" id="cancelEdit" type="button">Cancel</button>
+      <button class="btn primary" type="submit">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/ui/home.js"></script>
+</body>
+</html>

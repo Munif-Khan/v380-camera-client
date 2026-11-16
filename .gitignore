@@ -1,0 +1,44 @@
+# Configuration and secrets
+cameras.local.json
+cameras.local.json.tmp
+cameras.json
+*.local.json
+
+# Build outputs & artifacts
+bin/
+obj/
+*.apk
+*.aab
+*.ap_
+
+# Logs & media captures
+logs/
+analysis/
+*.log
+*.mp4
+*.h264
+*.mjpeg
+*.wav
+*.mp3
+
+# Tools & SDK caches
+tools/
+.gradle/
+.idea/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini

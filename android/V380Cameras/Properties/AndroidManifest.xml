@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+  <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+  <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+  <!-- Only needed to publish photos/clips on Android 9 and older. -->
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                   android:maxSdkVersion="28" />
+
+  <uses-feature android:name="android.hardware.wifi" android:required="false" />
+
+  <!-- The activity itself is declared by [Activity] in MainActivity.cs, which
+       keeps its launch mode and config-change list next to the code. -->
+  <application
+      android:label="V380 Cameras"
+      android:icon="@drawable/ic_launcher"
+      android:allowBackup="false"
+      android:usesCleartextTraffic="true"
+      android:hardwareAccelerated="true"
+      android:theme="@style/AppTheme" />
+</manifest>

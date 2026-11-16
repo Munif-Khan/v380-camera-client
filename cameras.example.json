@@ -1,0 +1,23 @@
+{
+  "cameras": [
+    {
+      "id": "front-door",
+      "name": "Front door",
+      "host": "192.168.1.100",
+      "deviceId": 0,
+      "username": "",
+      "password": "",
+      "quality": "sd",
+      "webPort": 8090,
+      "apiPort": 8091,
+      "capabilities": {
+        "light": "unverified",
+        "audioListen": "unverified",
+        "ptz": "unknown",
+        "sdPlayback": "unverified",
+        "alarmSettings": "unverified",
+        "sensitivity": "notImplemented"
+      }
+    }
+  ]
+}

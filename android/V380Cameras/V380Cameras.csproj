@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <SupportedOSPlatformVersion>24</SupportedOSPlatformVersion>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <ApplicationId>local.v380.cameras</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+
+    <!-- One APK with both phone ABIs so it installs anywhere. -->
+    <RuntimeIdentifiers>android-arm64;android-arm</RuntimeIdentifiers>
+    <_AndroidBuildRuntimeIdentifiersInParallel>false</_AndroidBuildRuntimeIdentifiersInParallel>
+
+    <!-- The protocol layer is reflection-free, so trimming is safe later; keep
+         it off for now so diagnostics stay readable. AOT requires trimming, so
+         it stays off too. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <AndroidLinkMode>None</AndroidLinkMode>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
+
+    <!-- The JNI marshal-method generator only runs as part of the link step.
+         With trimming off it produces a typemap whose native stubs are never
+         registered, so the Java callable wrappers call n_onCreate() and get
+         UnsatisfiedLinkError on first launch. Fall back to the dynamic
+         registration path instead. -->
+    <AndroidEnableMarshalMethods>false</AndroidEnableMarshalMethods>
+
+    <!-- Cleartext HTTP to 127.0.0.1 is required for the embedded UI. -->
+    <AndroidUseCleartextTraffic>true</AndroidUseCleartextTraffic>
+  </PropertyGroup>
+
+  <!-- The web UI is not copied: it is packaged straight from ../../ui so the
+       browser version and the app can never drift apart. -->
+  <ItemGroup>
+    <AndroidAsset Include="..\..\ui\**\*"
+                  Link="ui\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="bin\**;obj\**" />
+  </ItemGroup>
+
+</Project>
