@@ -1000,7 +1000,7 @@ namespace V380Decoder.src
         int ReadExact(NetworkStream s, byte[] buf, int off, int cnt)
         {
             int tot = 0;
-            var deadline = DateTime.Now.AddSeconds(3);
+            var deadline = DateTime.Now.AddSeconds(15);
             while (tot < cnt)
             {
                 if (DateTime.Now > deadline)
@@ -1016,6 +1016,7 @@ namespace V380Decoder.src
                 int n = s.Read(buf, off + tot, cnt - tot);
                 if (n <= 0) break;
                 tot += n;
+                deadline = DateTime.Now.AddSeconds(15);
             }
             return tot;
         }

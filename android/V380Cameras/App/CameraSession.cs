@@ -30,6 +30,7 @@ public sealed class CameraSession : IAsyncDisposable
     private volatile V380Client? client;
     private volatile VideoDecoder? decoder;
     private volatile CancellationTokenSource? attemptCts;
+    private volatile int activeQuality = -1;
 
     private volatile byte[]? latestJpeg;
     private long latestJpegTicks;
@@ -96,6 +97,7 @@ public sealed class CameraSession : IAsyncDisposable
             Interlocked.Exchange(ref lastFrameTicks, 0);
             SetState("starting");
             lastError = null;
+            activeQuality = config.IsHd ? 1 : 0;
 
             worker = Task.Run(() => RunAsync(token));
             watchdog = Task.Run(() => WatchdogAsync(token));
@@ -132,11 +134,12 @@ public sealed class CameraSession : IAsyncDisposable
             try
             {
                 SetState("connecting");
+                int q = activeQuality >= 0 ? activeQuality : (config.IsHd ? 1 : 0);
                 connection = new V380Client(
                     config.Host, config.Port, (uint)config.DeviceId,
                     config.Username, config.Password,
                     SourceStream.Lan, OutputMode.Video,
-                    config.IsHd ? 1 : 0);
+                    q);
 
                 connection.VideoReceived += OnVideo;
                 connection.AudioReceived += OnAudio;
@@ -170,6 +173,13 @@ public sealed class CameraSession : IAsyncDisposable
                 // token fires; it is the connection's whole lifetime.
                 await Task.Run(() => connection.ReceiveFrames(attempt.Token), attempt.Token);
                 if (stop.IsCancellationRequested) break;
+
+                if (activeQuality == 1 && Interlocked.Read(ref frames) == 0)
+                {
+                    Android.Util.Log.Warn("V380", $"{config.Name}: HD stream closed with 0 frames; falling back to SD mode");
+                    activeQuality = 0;
+                }
+
                 throw new IOException("The camera closed the stream");
             }
             catch (OperationCanceledException) when (stop.IsCancellationRequested)
@@ -212,6 +222,18 @@ public sealed class CameraSession : IAsyncDisposable
 
             long last = Interlocked.Read(ref lastFrameTicks);
             if (last == 0) continue;
+
+            // If the camera is in HD mode but produces 0 frames within 6 seconds, fall back to SD
+            if (activeQuality == 1 && Interlocked.Read(ref frames) == 0 && (Environment.TickCount64 - last) > 6000)
+            {
+                Android.Util.Log.Warn("V380", $"{config.Name}: HD stream delivered 0 frames in 6s; falling back to SD mode");
+                activeQuality = 0;
+                SetState("reconnecting", "HD stream unsupported; falling back to SD");
+                try { attemptCts?.Cancel(); } catch (Exception) { }
+                try { client?.Dispose(); } catch (Exception) { }
+                continue;
+            }
+
             if (Environment.TickCount64 - last <= StallSeconds * 1000) continue;
 
             SetState("reconnecting", "No video for " + StallSeconds + " s");
